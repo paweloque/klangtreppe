@@ -1,4 +1,4 @@
-# Tonleiter — Shepard's Tone Explorer
+# Klangtreppe — Shepard's Tone Explorer
 # Product Requirements Document
 
 **Version:** 1.0
@@ -26,15 +26,15 @@
 
 ## 1. Overview / Executive Summary
 
-**Tonleiter** (*German: "scale" / "tone ladder"*) is a web-based educational application that lets students explore the **Shepard's Tone** — one of the most striking auditory illusions in psychoacoustics. The name plays on the double meaning: a musical scale (*Tonleiter*) that appears to climb endlessly, like a ladder (*Leiter*) with no top.
+**Klangtreppe** (*German: "sound staircase"*) is a web-based educational application that lets students explore the **Shepard's Tone** — one of the most striking auditory illusions in psychoacoustics. The name evokes a staircase of sound (*Klangtreppe*) that appears to climb endlessly, yet always returns to where it started.
 
 The application allows users to hear, see, and deconstruct the Shepard's Tone illusion through interactive controls and real-time visualizations. Students can experience the complete illusion with a single click, then progressively peel back the layers to understand *how* and *why* it works — isolating individual octave components, manipulating the spectral envelope, toggling the "trick" on and off, and watching the mechanism unfold in synchronized visual displays.
 
-By bridging the gap between perception and physical reality, Tonleiter makes the principles of auditory illusions, octave equivalence, spectral envelopes, and logarithmic pitch perception accessible and engaging. The central design philosophy is the **"aha moment"** — the application is structured so that students first experience the illusion, then discover the mechanism through playful experimentation.
+By bridging the gap between perception and physical reality, Klangtreppe makes the principles of auditory illusions, octave equivalence, spectral envelopes, and logarithmic pitch perception accessible and engaging. The central design philosophy is the **"aha moment"** — the application is structured so that students first experience the illusion, then discover the mechanism through playful experimentation.
 
-Tonleiter requires no installation, no backend infrastructure, and runs entirely in a modern web browser, making it ideal for classroom use on any device with a screen and speakers. The user interface is in German, targeting German-speaking Gymnasium classrooms.
+Klangtreppe requires no installation, no backend infrastructure, and runs entirely in a modern web browser, making it ideal for classroom use on any device with a screen and speakers. The user interface is in German, targeting German-speaking Gymnasium classrooms.
 
-**Relationship to Klanglabor:** Tonleiter is a sibling application to [Klanglabor](../index.html) (a Fourier Synthesis explorer). Both share the same target audience, educational philosophy (playful discovery, immediate feedback), and technical constraints (vanilla JS, Web Audio API, static deployment). However, Tonleiter is a completely independent application with its own UI, interactions, and educational flow tailored specifically to the Shepard's Tone phenomenon.
+**Relationship to Klanglabor:** Klangtreppe is a sibling application to [Klanglabor](../index.html) (a Fourier Synthesis explorer). Both share the same target audience, educational philosophy (playful discovery, immediate feedback), and technical constraints (vanilla JS, Web Audio API, static deployment). However, Klangtreppe is a completely independent application with its own UI, interactions, and educational flow tailored specifically to the Shepard's Tone phenomenon.
 
 ---
 
@@ -472,7 +472,7 @@ The UI is designed to fit entirely within the browser viewport (`100vh × 100vw`
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  HEADER                                                                     │
-│  Tonleiter — Shepards Tone Explorer    [📖 Anleitung]  [▶ Abspielen]       │
+│  Klangtreppe — Shepards Tone Explorer    [📖 Anleitung]  [▶ Abspielen]       │
 ├────────────────────────────────────────────┬────────────────────────────────┤
 │                                            │  CONTROLS PANEL               │
 │                                            │                               │
@@ -510,7 +510,7 @@ The UI is designed to fit entirely within the browser viewport (`100vh × 100vw`
 ├────────────────────────────────────────────┴────────────────────────────────┤
 │  FOOTER                                                                     │
 │  Vorlagen: [Klassisch][Wenige][Viele][Schmal][Breit][Ohne][Ab][Tonleiter]  │
-│  Lautstärke: [━━━●━━━━]   [🔗 Teilen]   Über Tonleiter | Impressum        │
+│  Lautstärke: [━━━●━━━━]   [🔗 Teilen]   Über Klangtreppe | Impressum        │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -518,7 +518,7 @@ The UI is designed to fit entirely within the browser viewport (`100vh × 100vw`
 
 The layout differs significantly from Klanglabor:
 
-- **Visualization-dominant:** The visualization area takes ~65-70% of the viewport width, because understanding the Shepard's Tone requires *seeing* the mechanism. In Klanglabor, the controls panel is on the left and the visualization on the right; in Tonleiter, the visualization is on the left (primary focus) and controls on the right (secondary).
+- **Visualization-dominant:** The visualization area takes ~65-70% of the viewport width, because understanding the Shepard's Tone requires *seeing* the mechanism. In Klanglabor, the controls panel is on the left and the visualization on the right; in Klangtreppe, the visualization is on the left (primary focus) and controls on the right (secondary).
 - **Controls as a sidebar:** All parameter controls are grouped in a right-side panel, organized into collapsible sections. This keeps the visualization uncluttered while providing full control access.
 - **Presets in the footer:** Presets are placed in the footer bar for quick access without taking space from the visualization or controls.
 - **Play button in the header:** The primary action (play/stop) is in the header for maximum visibility and one-click access.
@@ -545,7 +545,7 @@ The overlay does not cover the full visualization — it sits at the bottom ~20%
 
 | Component | Description |
 |-----------|-------------|
-| **Header** | Displays "Tonleiter" title and subtitle "Shepards Tone Explorer". Contains the tutorial button ("📖 Anleitung") and the primary play/stop button. Minimal fixed height. |
+| **Header** | Displays "Klangtreppe" title and subtitle "Shepards Tone Explorer". Contains the tutorial button ("📖 Anleitung") and the primary play/stop button. Minimal fixed height. |
 | **Visualization Area** | Large canvas area (~65-70% of viewport width). Contains visualization tab selector at the top and the active visualization canvas below. The canvas fills the available space. |
 | **Visualization Tabs** | Four buttons to switch between Hüllkurve (Envelope), Spektrum (Spectrum), Spirale (Spiral), and Welle (Waveform) views. |
 | **Controls Panel** | Right sidebar (~30-35% of viewport width) containing all parameter controls organized in collapsible sections. Scrolls internally if content exceeds available height. |
@@ -579,7 +579,7 @@ The application uses a dark theme optimized for projector visibility and visual 
 - **Envelope curve:** Semi-transparent warm gradient
 - **Text:** Light gray (#e0e0e0) for readability on dark backgrounds
 
-This dark theme contrasts with Klanglabor's lighter aesthetic, giving Tonleiter its own visual identity while being equally suitable for classroom projection.
+This dark theme contrasts with Klanglabor's lighter aesthetic, giving Klangtreppe its own visual identity while being equally suitable for classroom projection.
 
 ---
 
@@ -644,7 +644,7 @@ The following features are candidates for post-MVP development, listed in approx
 | **Shepard-Risset Glissando Variants** | Explore variations like the "Shepard-Risset glissando" with different waveforms (not just sine — sawtooth, triangle) to show how timbre affects the illusion. |
 | **Mobile Phone Support** | Optimized layout and touch interactions for screens narrower than 768px. |
 | **Classroom Quiz Mode** | A mode where the teacher can play different configurations and students vote on whether the pitch is "really" ascending or if it's an illusion — gamifying the learning experience. |
-| **Integration with Klanglabor** | Cross-linking between Tonleiter and Klanglabor, allowing students to explore the connection between Fourier synthesis (Klanglabor) and spectral perception (Tonleiter). |
+| **Integration with Klanglabor** | Cross-linking between Klangtreppe and Klanglabor, allowing students to explore the connection between Fourier synthesis (Klanglabor) and spectral perception (Klangtreppe). |
 
 ---
 
@@ -696,7 +696,7 @@ Shepard, R. N. (1964). "Circularity in Judgments of Relative Pitch." *Journal of
 
 | German Term | English | Context |
 |-------------|---------|---------|
-| Tonleiter | Scale / Tone Ladder | Application name |
+| Klangtreppe | Sound Staircase | Application name |
 | Hüllkurve | Envelope | Spectral envelope |
 | Schicht / Schichten | Layer / Layers | Octave components |
 | Aufsteigend | Ascending | Direction control |
@@ -722,4 +722,4 @@ Shepard, R. N. (1964). "Circularity in Judgments of Relative Pitch." *Journal of
 
 ---
 
-*This document serves as the foundation for implementation planning for Tonleiter. It should be reviewed and updated as the project evolves.*
+*This document serves as the foundation for implementation planning for Klangtreppe. It should be reviewed and updated as the project evolves.*
