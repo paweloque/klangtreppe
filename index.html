@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klangtreppe — Shepards Tone Explorer</title>
+  <meta name="description" content="Interaktive Erkundung des Shepard-Tons — eine faszinierende auditive Illusion">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header" role="banner">
+    <div class="header__title">
+      <h1>Klangtreppe</h1>
+      <span class="header__subtitle">Shepards Tone Explorer</span>
+    </div>
+    <div class="header__actions">
+      <button id="btn-tutorial" class="btn btn--secondary"
+              aria-label="Anleitung starten"
+              data-tooltip="Geführte Einführung in den Shepard-Ton starten">
+        📖 Anleitung
+      </button>
+      <button id="btn-play" class="btn btn--primary btn--play"
+              aria-label="Abspielen"
+              data-tooltip="Wiedergabe starten/stoppen">
+        ▶ Abspielen
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" role="main">
+
+    <!-- VISUALIZATION AREA -->
+    <section class="viz-area" aria-label="Visualisierung">
+
+      <!-- Visualization Tabs -->
+      <nav class="viz-tabs" role="tablist" aria-label="Visualisierungsauswahl">
+        <button role="tab" id="tab-envelope" aria-selected="true"
+                aria-controls="viz-canvas" data-view="envelope"
+                class="btn--active">
+          Hüllkurve
+        </button>
+        <button role="tab" id="tab-spectrum" aria-selected="false"
+                aria-controls="viz-canvas" data-view="spectrum">
+          Spektrum
+        </button>
+        <button role="tab" id="tab-spiral" aria-selected="false"
+                aria-controls="viz-canvas" data-view="spiral">
+          Spirale
+        </button>
+        <button role="tab" id="tab-waveform" aria-selected="false"
+                aria-controls="viz-canvas" data-view="waveform">
+          Wellenform
+        </button>
+      </nav>
+
+      <!-- Canvas -->
+      <div class="viz-canvas-container" role="tabpanel" id="viz-canvas"
+           aria-labelledby="tab-envelope">
+        <canvas id="canvas" aria-label="Visualisierung der Shepard-Töne"></canvas>
+      </div>
+
+      <!-- Tutorial Overlay (hidden by default) -->
+      <div id="tutorial-overlay" class="tutorial-overlay" hidden
+           role="dialog" aria-label="Anleitung" aria-modal="true">
+        <div class="tutorial-overlay__content">
+          <p class="tutorial-overlay__step" id="tutorial-step-label"></p>
+          <h3 class="tutorial-overlay__title" id="tutorial-title"></h3>
+          <p class="tutorial-overlay__text" id="tutorial-text"></p>
+          <div class="tutorial-overlay__nav">
+            <button id="btn-tutorial-prev" class="btn btn--secondary">← Zurück</button>
+            <button id="btn-tutorial-next" class="btn btn--primary">Weiter →</button>
+            <button id="btn-tutorial-end" class="btn btn--ghost">✕ Beenden</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CONTROLS SIDEBAR -->
+    <aside class="controls-panel" aria-label="Steuerung">
+
+      <!-- Direction -->
+      <fieldset class="control-group">
+        <legend data-tooltip="Richtung der Tonhöhenänderung">Richtung</legend>
+        <div class="btn-group" role="radiogroup" aria-label="Richtung">
+          <button role="radio" aria-checked="true" data-direction="ascending"
+                  data-tooltip="Tonhöhe steigt kontinuierlich">
+            ↑ Auf
+          </button>
+          <button role="radio" aria-checked="false" data-direction="descending"
+                  data-tooltip="Tonhöhe sinkt kontinuierlich">
+            ↓ Ab
+          </button>
+          <button role="radio" aria-checked="false" data-direction="paused"
+                  data-tooltip="Tonhöhe bleibt konstant">
+            ⏸ Halt
+          </button>
+        </div>
+        <button id="btn-freeze" class="btn btn--toggle"
+                aria-pressed="false"
+                data-tooltip="Gleitbewegung einfrieren, um den aktuellen Zustand zu untersuchen">
+          ❄ Einfrieren
+        </button>
+      </fieldset>
+
+      <!-- Speed -->
+      <fieldset class="control-group">
+        <legend data-tooltip="Geschwindigkeit der Tonhöhenänderung in Oktaven pro Sekunde">
+          Geschwindigkeit
+        </legend>
+        <label>
+          <input type="range" id="slider-speed"
+                 min="0" max="1" step="0.01" value="0.18"
+                 aria-label="Geschwindigkeit"
+                 aria-valuemin="0.033" aria-valuemax="0.4" aria-valuenow="0.1"
+                 aria-valuetext="0.10 Oktaven pro Sekunde">
+          <output for="slider-speed" id="speed-value">0.10 Okt/s</output>
+        </label>
+      </fieldset>
+
+      <!-- Envelope -->
+      <fieldset class="control-group">
+        <legend data-tooltip="Die Hüllkurve bestimmt die Lautstärke jeder Schicht basierend auf ihrer Frequenz — sie ist der Schlüssel zur Illusion">
+          Hüllkurve
+        </legend>
+        <label class="toggle-label"
+               data-tooltip="Hüllkurve ein/ausschalten — ohne Hüllkurve bricht die Illusion zusammen">
+          <input type="checkbox" id="chk-envelope" checked
+                 aria-label="Hüllkurve aktivieren/deaktivieren">
+          <span>Aktiv</span>
+        </label>
+        <label data-tooltip="Mittenfrequenz der Hüllkurve — bestimmt, welche Tonhöhen am lautesten sind">
+          Mitte
+          <input type="range" id="slider-env-center"
+                 min="0" max="1" step="0.005" value="0.39"
+                 aria-label="Hüllkurve Mittenfrequenz"
+                 aria-valuenow="500" aria-valuetext="500 Hz">
+          <output for="slider-env-center" id="env-center-value">500 Hz</output>
+        </label>
+        <label data-tooltip="Breite der Hüllkurve in Oktaven — schmalere Kurve = weniger hörbare Schichten">
+          Breite
+          <input type="range" id="slider-env-width"
+                 min="1" max="6" step="0.1" value="3"
+                 aria-label="Hüllkurve Breite in Oktaven"
+                 aria-valuenow="3.0" aria-valuetext="3.0 Oktaven">
+          <output for="slider-env-width" id="env-width-value">3.0 Okt</output>
+        </label>
+      </fieldset>
+
+      <!-- Layers -->
+      <fieldset class="control-group">
+        <legend data-tooltip="Sinustöne im Oktavabstand, die gleichzeitig gleiten">
+          Schichten
+        </legend>
+        <label data-tooltip="Anzahl der gleichzeitig klingenden Oktavschichten">
+          Anzahl
+          <input type="range" id="slider-layers"
+                 min="3" max="8" step="1" value="6"
+                 aria-label="Anzahl der Schichten"
+                 aria-valuenow="6" aria-valuetext="6 Schichten">
+          <output for="slider-layers" id="layers-value">6</output>
+        </label>
+        <div id="layer-list" class="layer-list" role="list"
+             aria-label="Schichten">
+          <!-- Dynamically generated layer items -->
+        </div>
+      </fieldset>
+
+      <!-- Mode -->
+      <fieldset class="control-group">
+        <legend data-tooltip="Kontinuierliches Gleiten oder diskrete Tonschritte">
+          Modus
+        </legend>
+        <div class="btn-group" role="radiogroup" aria-label="Modus">
+          <button role="radio" aria-checked="true" data-mode="continuous"
+                  data-tooltip="Shepard-Ton: kontinuierliches Gleiten der Tonhöhe">
+            Kontinuierlich
+          </button>
+          <button role="radio" aria-checked="false" data-mode="discrete"
+                  data-tooltip="Shepard-Tonleiter: Tonhöhe springt in Halbton-/Ganztonschritten">
+            Stufen
+          </button>
+        </div>
+        <!-- Discrete mode options (shown only when discrete is active) -->
+        <div id="discrete-options" class="discrete-options" hidden>
+          <label data-tooltip="Größe der Tonschritte im diskreten Modus">
+            Intervall
+            <select id="select-interval" aria-label="Schrittintervall">
+              <option value="semitone" selected>Halbton</option>
+              <option value="wholetone">Ganzton</option>
+              <option value="minorthird">Kleine Terz</option>
+            </select>
+          </label>
+          <label data-tooltip="Geschwindigkeit der Tonschritte pro Sekunde">
+            Tempo
+            <input type="range" id="slider-step-rate"
+                   min="0.5" max="4" step="0.1" value="1"
+                   aria-label="Schritte pro Sekunde"
+                   aria-valuenow="1.0" aria-valuetext="1.0 Schritte pro Sekunde">
+            <output for="slider-step-rate" id="step-rate-value">1.0 /s</output>
+          </label>
+        </div>
+      </fieldset>
+
+    </aside>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__presets">
+      <span class="footer__label">Vorlagen:</span>
+      <div id="preset-buttons" class="preset-buttons" role="group"
+           aria-label="Vorlagen">
+        <button data-preset="klassisch" class="btn btn--preset btn--active">Klassisch</button>
+        <button data-preset="wenige" class="btn btn--preset">Wenige</button>
+        <button data-preset="viele" class="btn btn--preset">Viele</button>
+        <button data-preset="schmal" class="btn btn--preset">Schmal</button>
+        <button data-preset="breit" class="btn btn--preset">Breit</button>
+        <button data-preset="ohne" class="btn btn--preset">Ohne</button>
+        <button data-preset="absteigend" class="btn btn--preset">Ab</button>
+        <button data-preset="tonleiter" class="btn btn--preset">Tonleiter</button>
+      </div>
+    </div>
+    <div class="footer__controls">
+      <label class="volume-control" data-tooltip="Gesamtlautstärke">
+        🔊
+        <input type="range" id="slider-volume"
+               min="0" max="1" step="0.01" value="0.5"
+               aria-label="Lautstärke"
+               aria-valuenow="0.5" aria-valuetext="50% Lautstärke">
+      </label>
+      <button id="btn-share" class="btn btn--secondary"
+              aria-label="Konfiguration als URL teilen"
+              data-tooltip="Aktuelle Konfiguration als URL kopieren">
+        🔗 Teilen
+      </button>
+    </div>
+  </footer>
+
+  <!-- Tooltip container (reused) -->
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+
+  <!-- Hidden screen reader status -->
+  <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

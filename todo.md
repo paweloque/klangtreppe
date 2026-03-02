@@ -1,0 +1,1 @@
+I think that there is a problem with the last tone, there is a moment at the end where the last tone prematurely disappears. This makes the whole illusion of the shepards-tone disappear. Can you fix this? I think that the last tone must not disappear while it can still be heard, but I'm not fully sure whether this is the real problem. 
