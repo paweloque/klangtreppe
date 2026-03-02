@@ -136,6 +136,10 @@ function drawBars(ctx, plotW, plotH, state) {
     const layer = layers[i];
     if (layer.currentFreq <= 0) continue;
 
+    // Skip bars that are effectively silent — prevents visible jumping
+    // when a layer wraps from one end of the frequency range to the other
+    if (layer.currentAmp < 0.02) continue;
+
     const color = LAYER_COLORS[i % LAYER_COLORS.length];
     const x = freqToLog(layer.currentFreq, MIN_FREQ, MAX_FREQ) * plotW;
     const barH = layer.currentAmp * plotH;
@@ -146,7 +150,10 @@ function drawBars(ctx, plotW, plotH, state) {
     if (barX + BAR_WIDTH < 0 || barX > plotW) continue;
 
     if (!layer.enabled) {
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.2 * layer.currentAmp;
+    } else {
+      // Opacity driven by amplitude for smooth fade at envelope edges
+      ctx.globalAlpha = Math.max(0.1, layer.currentAmp);
     }
 
     // Bar body
@@ -154,14 +161,15 @@ function drawBars(ctx, plotW, plotH, state) {
     ctx.fillRect(barX, barY, BAR_WIDTH, barH);
 
     // Bright cap on top
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.6 * layer.currentAmp})`;
     ctx.fillRect(barX, barY, BAR_WIDTH, CAP_HEIGHT);
 
-    // Frequency label below bar
+    // Frequency label below bar — fade with amplitude
     ctx.font = '10px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillStyle = THEME.gridLabel;
+    ctx.globalAlpha = Math.max(0.1, layer.currentAmp);
     ctx.fillText(formatFrequency(layer.currentFreq), x, plotH + 22);
 
     ctx.globalAlpha = 1;

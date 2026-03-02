@@ -108,6 +108,10 @@ function drawLayerDots(ctx, cx, cy, radius, state) {
     const layer = layers[i];
     if (layer.currentFreq <= 0) continue;
 
+    // Skip dots that are effectively silent — prevents visible jumping
+    // when a layer wraps from one end of the frequency range to the other
+    if (layer.currentAmp < 0.02) continue;
+
     const color = LAYER_COLORS[i % LAYER_COLORS.length];
     const pitchClass = freqToPitchClass(layer.currentFreq);
 
@@ -122,26 +126,27 @@ function drawLayerDots(ctx, cx, cy, radius, state) {
     const dotRadius = 8 + layer.currentAmp * 8;
 
     if (!layer.enabled) {
-      // Muted: hollow dimmed dot
+      // Muted: hollow dimmed dot, opacity driven by amplitude
       ctx.beginPath();
       ctx.arc(dotX, dotY, dotRadius * 0.6, 0, Math.PI * 2);
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
-      ctx.globalAlpha = 0.25;
+      ctx.globalAlpha = 0.25 * layer.currentAmp;
       ctx.stroke();
       ctx.globalAlpha = 1;
     } else {
-      // Active: filled with glow
-      const alpha = Math.max(0.3, layer.currentAmp);
+      // Active: filled with glow, opacity driven by amplitude
+      // This ensures dots fade out smoothly at envelope edges
+      const ampAlpha = layer.currentAmp;
 
       // Glow
       ctx.shadowColor = color;
-      ctx.shadowBlur = 14 * alpha;
+      ctx.shadowBlur = 14 * ampAlpha;
 
       ctx.beginPath();
       ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
       ctx.fillStyle = color;
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = ampAlpha;
       ctx.fill();
 
       // Reset shadow
@@ -149,10 +154,10 @@ function drawLayerDots(ctx, cx, cy, radius, state) {
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
-      // White highlight
+      // White highlight — also fades with amplitude
       ctx.beginPath();
       ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 * ampAlpha})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     }

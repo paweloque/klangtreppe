@@ -156,6 +156,10 @@ function drawEnvelopeCurve(ctx, plotW, plotH, state) {
 
 /**
  * Draw animated layer marker dots on the envelope curve.
+ * Dots use currentAmp as opacity so they naturally fade out at the
+ * envelope edges (near the octave wrap point) and fade in as they
+ * move toward the center. This prevents visible "jumping" when a
+ * layer wraps from one end of the frequency range to the other.
  * @param {CanvasRenderingContext2D} ctx
  * @param {number} plotW
  * @param {number} plotH
@@ -170,6 +174,10 @@ function drawLayerMarkers(ctx, plotW, plotH, state) {
   for (let i = 0; i < layers.length; i++) {
     const layer = layers[i];
     if (layer.currentFreq <= 0) continue;
+
+    // Skip dots that are effectively silent — they're at the wrap point
+    // and would just show a distracting jump
+    if (layer.currentAmp < 0.02) continue;
 
     const x = freqToLog(layer.currentFreq, MIN_FREQ, MAX_FREQ) * plotW;
     const y = plotH - layer.currentAmp * plotH;
@@ -186,19 +194,20 @@ function drawLayerMarkers(ctx, plotW, plotH, state) {
       // Muted: draw hollow/dimmed
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.3 * layer.currentAmp;
       ctx.stroke();
       ctx.globalAlpha = 1;
     } else {
-      // Active: filled with glow
-      const glowAlpha = Math.max(0.2, layer.currentAmp);
+      // Active: filled with glow, opacity driven by amplitude
+      // This ensures dots fade out smoothly at envelope edges
+      const ampAlpha = layer.currentAmp;
 
-      // Glow effect
+      // Glow effect — scales with amplitude
       ctx.shadowColor = color;
-      ctx.shadowBlur = 12 * glowAlpha;
+      ctx.shadowBlur = 12 * ampAlpha;
 
       ctx.fillStyle = color;
-      ctx.globalAlpha = Math.max(0.3, glowAlpha);
+      ctx.globalAlpha = ampAlpha;
       ctx.fill();
 
       // Reset shadow
@@ -206,8 +215,8 @@ function drawLayerMarkers(ctx, plotW, plotH, state) {
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
-      // White highlight ring
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      // White highlight ring — also fades with amplitude
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 * ampAlpha})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     }

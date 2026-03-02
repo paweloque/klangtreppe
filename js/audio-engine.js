@@ -102,12 +102,21 @@ export function buildOscillators(layerCount) {
   destroyOscillators();
 
   const now = audioContext.currentTime;
+  const { envelopeCenter, pitchOffset } = getState();
+  const N = layerCount;
+
+  // Base frequency: center the N-octave range on envelopeCenter in log space
+  // baseFreq = envelopeCenter / 2^(N/2)
+  const baseFreq = envelopeCenter / Math.pow(2, N / 2);
 
   for (let i = 0; i < layerCount; i++) {
-    // Create oscillator
+    // Layer's modular position in [0, N)
+    const pos = (((pitchOffset || 0) + i) % N + N) % N;
+
+    // Create oscillator — initial frequency using new Shepard formula
     const osc = audioContext.createOscillator();
     osc.type = 'sine';
-    osc.frequency.value = LIMITS.baseFrequency * Math.pow(2, i);
+    osc.frequency.value = baseFreq * Math.pow(2, pos);
 
     // Create per-layer gain node, starting at 0 (silent)
     const gain = audioContext.createGain();
@@ -165,6 +174,19 @@ export function setLayerFrequency(index, freq) {
 }
 
 /**
+ * Set oscillator frequency instantly using setValueAtTime (no smoothing).
+ * Used when a layer wraps octaves while silenced, to avoid audible frequency sweeps.
+ * @param {number} index - Layer index
+ * @param {number} freq - Target frequency in Hz
+ */
+export function setLayerFrequencyInstant(index, freq) {
+  if (index < 0 || index >= oscillators.length || !audioContext) return;
+  const osc = oscillators[index];
+  osc.frequency.cancelScheduledValues(audioContext.currentTime);
+  osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+}
+
+/**
  * Set layer gain using setTargetAtTime for click-free transitions.
  * @param {number} index - Layer index
  * @param {number} gain - Target gain value (0–1)
@@ -174,6 +196,18 @@ export function setLayerGain(index, gain) {
   const gainNode = layerGainNodes[index];
   // Use ~20ms time constant for gain changes (slightly longer than frequency)
   gainNode.gain.setTargetAtTime(gain, audioContext.currentTime, 0.02);
+}
+
+/**
+ * Instantly silence a layer's gain using setValueAtTime (no smoothing).
+ * Used before frequency jumps at octave wrap points to guarantee silence.
+ * @param {number} index - Layer index
+ */
+export function silenceLayerInstant(index) {
+  if (index < 0 || index >= layerGainNodes.length || !audioContext) return;
+  const gainNode = layerGainNodes[index];
+  gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 }
 
 /**
